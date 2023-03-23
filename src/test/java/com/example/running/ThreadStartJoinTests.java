@@ -6,7 +6,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import com.example.running.CaptureSystemOutput.OutputCapture;
 import org.junit.jupiter.api.Test;
 
-public class ThreadTest {
+public class ThreadStartJoinTests {
 
 	static class HelloRunnable implements Runnable {
 
@@ -24,10 +24,19 @@ public class ThreadTest {
 
 	@Test
 	@CaptureSystemOutput
-	public void startThreadShouldPrintMessage(OutputCapture capture) throws InterruptedException {
-		// it passes since verification done after test finished and thread output were also captured
-		capture.expect(containsString("Thread!"));
+	public void captureShouldCheckForExpectations(OutputCapture capture) throws InterruptedException {
+		Thread thread = new Thread(new HelloRunnable());
+		thread.start();
 
+		// without join() method call, the test might finish first, and the thread prints later.
+		thread.join();
+
+		capture.expect(containsString("Test"));
+	}
+
+	@Test
+	@CaptureSystemOutput
+	public void startThreadShouldPrintMessage(OutputCapture capture) throws InterruptedException {
 		System.out.println("Hello Test!");
 		Thread thread = (new Thread(new HelloRunnable()));
 		thread.start();
@@ -40,6 +49,9 @@ public class ThreadTest {
 		// assert thread output
 		// fail if new thread is not joined with current thread.
 		assertThat(output).contains("Thread!");
+
+		// another way to verify the captured output, after test finished
+		capture.expect(containsString("Thread!"));
 	}
 
 }
