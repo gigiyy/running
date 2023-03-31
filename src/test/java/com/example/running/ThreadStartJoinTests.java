@@ -31,7 +31,7 @@ public class ThreadStartJoinTests {
 		// without join() method call, the test might finish first, and the thread prints later.
 		thread.join();
 
-		capture.expect(containsString("Test"));
+		capture.expect(containsString("Thread"));
 	}
 
 	@Test
